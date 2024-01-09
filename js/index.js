@@ -11,7 +11,7 @@ $BoxWrap.className = "BoxWrap"
 $ContentBox.appendChild($BoxWrap)
 
 let $Title = document.createElement("h1")
-$Title.innerText = "TodoList"
+$Title.innerText = "todolist"
 $BoxWrap.appendChild($Title)
 
 let $AddText = document.createElement("input")
@@ -28,10 +28,9 @@ let $ListBox = document.createElement("ul")
 $ListBox.className = "ListBox"
 $BoxWrap.appendChild($ListBox)
 
-
 function saveToLocalStorage() {
     const items = [];
-    const $items = document.querySelectorAll(".ListBox li");
+    const $items = document.querySelectorAll(".ListBox li span");
     $items.forEach(($item) => {
         const text = $item.firstChild.textContent;
         items.push(text);
@@ -40,18 +39,28 @@ function saveToLocalStorage() {
 }
 
 function loadFromLocalStorage() {
-    const storedItems = localStorage.getItem("todoList");
-    if (storedItems) {
-        const items = JSON.parse(storedItems);
-        items.forEach((el) => {
+    const todoList = localStorage.getItem("todoList");
+    if (todoList) {
+        const parsedList = JSON.parse(todoList);
+        parsedList.forEach((el) => {
             const $list = document.createElement("li");
-            $list.innerText = el;
-
+            const $listWrap = document.createElement("div");
+            const $text = document.createElement("span");
             const $RemoveBtn = document.createElement("button");
-            $RemoveBtn.innerText = "삭제";
+            const $EditBtn = document.createElement("button");
 
-            $list.appendChild($RemoveBtn);
             $ListBoxs.appendChild($list);
+            $list.appendChild($listWrap);
+
+            $listWrap.appendChild($text);
+            $listWrap.className = "listwrap";
+            $text.innerText = el;
+
+            $listWrap.appendChild($EditBtn);
+            $EditBtn.innerText = "수정";
+
+            $listWrap.appendChild($RemoveBtn);
+            $RemoveBtn.innerText = "삭제";
 
             $RemoveBtn.addEventListener("click", () => {
                 if (confirm("정말로 삭제하시겠습니까?")) {
@@ -59,34 +68,71 @@ function loadFromLocalStorage() {
                     saveToLocalStorage();
                 }
             });
+
+            $EditBtn.addEventListener("click", () => {
+               
+            });
         });
     }
 }
+
+
 // 기존코드
 const $AddListBtn = document.querySelector(".AddListBtn")
 const $ListBoxs = document.querySelector(".ListBox")
 const $ListRemove = document.querySelector(".RemoveBtn")
+const $ListEdit = document.querySelector(".EditBtn")
 
 $AddListBtn.addEventListener("click",()=>{
     let $list = document.createElement("li")
+    let $listWrap = document.createElement('div')
+    let $text = document.createElement('span')
     let $RemoveBtn = document.createElement("button")
+    let $EditBtn = document.createElement("button");
     
     if(!$AddText.value){
         alert("내용을 입력해주세요.");
     }else{
-        $list.innerText = $AddText.value;
         $ListBoxs.appendChild($list);
-        $AddText.value ="";
+        $list.appendChild($listWrap)
 
-        $list.appendChild($RemoveBtn)
+        $listWrap.appendChild($text)
+        $listWrap.className = "listwrap"
+        $text.innerText = $AddText.value;
+        $AddText.value =""
+        $listWrap.appendChild($EditBtn);
+        $EditBtn.innerText = "수정";
+        
+        $listWrap.appendChild($RemoveBtn)
         $RemoveBtn.innerText = "삭제"
 
         $RemoveBtn.addEventListener("click", () => {
             if(confirm("정말로 삭제하시겠습니까?")){
                 $list.remove();
             }
-        });
+        }); 
         saveToLocalStorage()
+
+        $EditBtn.addEventListener("click", ()=>{
+            let $EditInput = document.createElement("input")
+            const EditValue = $EditInput.value
+            EditValue = $text.innerText
+  
+            if(EditValue){
+                
+                $EditBtn.remove();
+                $RemoveBtn.remove();
+
+
+                let $ChkBtn = document.createElement("button")
+                $listWrap.appendChild($ChkBtn)
+                $ChkBtn.innerText = "변경"
+
+                let $CancelBtn = document.createElement("button")
+                $listWrap.appendChild($CancelBtn)
+                $CancelBtn.innerText = "취소"
+            } 
+       })
     }    
 })
 
@@ -94,4 +140,3 @@ window.addEventListener("load", () => {
     loadFromLocalStorage();
 });
 
-//youtube.com/watch?v=3PHXvlpOkf4
